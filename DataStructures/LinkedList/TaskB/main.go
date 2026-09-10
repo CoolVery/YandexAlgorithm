@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"strconv"
-	"strings"
 )
 //Структура хранения вычитаний, элементов, их индексов в слайсе
 type DateResult struct {
@@ -138,18 +136,13 @@ func main() {
 	//Сколько элементов
 	var countElem int
 	//Строка с элементами 
-	var stringElems string
-	elemIntSlice := make([]int, 0)
-	fmt.Scanln(&countElem)
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	stringElems = scanner.Text()
-	elemStrSlice := strings.Fields(stringElems)
-	//Конвертируем строки в число и заполняем слайс
-	for _, elem := range elemStrSlice {
-		elemInt, _ := strconv.Atoi(elem)
-		elemIntSlice = append(elemIntSlice, elemInt)
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Fscan(reader, &countElem)
+	elemIntSlice := make([]int, countElem)
+	for i := 0; i < countElem; i++ {
+		fmt.Fscan(reader, &elemIntSlice[i])
 	}
+	
 
 	//Ищем минимальную разницу
 	SearcMinSub(elemIntSlice)

@@ -7,8 +7,25 @@ import (
 )
 
 type Sub struct {
-	numerator int
+	numerator   int
 	denominator int
+}
+
+func CutBack(sub *Sub) {
+	if sub.denominator%sub.numerator == 0 && sub.numerator <= sub.denominator {
+		tempDenominator := sub.numerator
+		sub.numerator /= tempDenominator
+		sub.denominator /= tempDenominator
+	}
+	if sub.numerator > sub.denominator && sub.numerator%sub.denominator == 0 {
+		tempDenominator := sub.denominator
+		sub.numerator /= tempDenominator
+		sub.denominator /= tempDenominator
+	}
+}
+
+func FoundMinSubForMax() {
+	
 }
 
 func main() {
@@ -23,34 +40,65 @@ func main() {
 		var numerator, denominator int
 		fmt.Fscan(reader, &numerator, &denominator)
 		newSub := Sub{
-			numerator: numerator,
+			numerator:   numerator,
 			denominator: denominator,
 		}
-		sliceSub[i] = newSub 
+		sliceSub[i] = newSub
 	}
 
+	minSub := Sub{}
+	isFoundMin := false
 	for _, sub := range sliceSub {
-		dictionarySubResult[sub] = float64(sub.numerator) / float64(sub.denominator)
-	}
-
-	for _, result := range dictionarySubResult {
-		dictionaryResultCount[result]++
-	}
-	maxValue := 0
-	maxResult := 0.0
-	for key, value := range dictionaryResultCount {
-		if value > maxValue {
-			maxResult = key
-			maxValue = value
+		CutBack(&sub)
+		subResult := float64(sub.numerator) / float64(sub.denominator)
+		dictionarySubResult[sub] = subResult
+		dictionaryResultCount[subResult]++
+		if !isFoundMin {
+			minSub = sub
+			isFoundMin = true
 		}
 	}
-	minSub := sliceSub[0]
-	for sub, result := range dictionarySubResult {
-		if result == maxResult {
-			if minSub.numerator * sub.denominator > sub.numerator * minSub.denominator {
-				minSub = sub
+
+	tempCount := 1
+	equalCount := 0
+	for _, count := range dictionaryResultCount {
+		if count == tempCount {
+			equalCount++
+		}
+
+		tempCount = count
+	}
+
+	if equalCount == len(dictionaryResultCount) {
+		for sub, _ := range dictionarySubResult {
+			
+				if minSub.numerator * sub.denominator > sub.numerator * minSub.denominator {
+					minSub = sub
+				}
+			
+		}
+	} else {
+		maxResult := 0.0
+		maxCount := dictionaryResultCount[dictionarySubResult[minSub]]
+		for result, count := range dictionaryResultCount {
+			if maxCount < count {
+				maxCount = count
+				maxResult = result
+			}
+		}
+
+
+		for sub, result := range dictionarySubResult {
+			if result == maxResult {
+				if minSub.numerator * sub.denominator > sub.numerator * minSub.denominator {
+					minSub = sub
+				}
 			}
 		}
 	}
+
+
+	
+
 	fmt.Printf("%d %d", minSub.numerator, minSub.denominator)
 }

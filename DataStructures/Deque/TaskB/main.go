@@ -5,67 +5,61 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
-//Добавляем в конец
-func addInEnd(deque []int, num int) []int {
-	return append(deque, num)
-}
-//Добавляем в начало
-func addInHead(deque []int, num int) []int {
-	temp := make([]int, 0, len(deque) + 1)
-	temp = append(temp, num)
-	temp = append(temp, deque...)
-	return temp
-}
-//Удаляем голову
-func deleteHead(deque []int) []int {
-	if len(deque) != 0 {
-		return deque[1:]
-	}
-	return deque
-}
-//Удаляем конец
-func deleteEnd(deque []int) []int {
-	if len(deque) != 0 {
-		return deque[:len(deque) - 1]
-	}
-	return deque
-}
+
 //Печатаем голову
-func printHeadAndEnd(deque []int) {
-	if len(deque) == 0 {
+func printHeadAndEnd(deque []int, head, tail int) {
+	if head > tail {
 		fmt.Println(-1)
 		return
-	} else if len(deque) == 1 {
-		fmt.Printf("%d %d\n", deque[0], deque[0])
-		return
 	}
-			fmt.Printf("%d %d\n", deque[0], deque[len(deque) - 1])
+	fmt.Printf("%d %d\n", deque[head],  deque[tail])
 
 }
 func main() {
-	deque := make([]int, 0)
-	reader := bufio.NewReader(os.Stdin)
+	//Основная идея - у нас есть готовый слайс с несколькими 0
+    //Мы проходим и заполняем с помощью двух индексов - head и tail
+	in := bufio.NewReader(os.Stdin)
+	out := bufio.NewWriter(os.Stdout)
+	defer out.Flush()
 	var countValue int
-	fmt.Fscan(reader, &countValue)
-	reader.ReadString('\n')
+	fmt.Fscan(in, &countValue)
+	deque := make([]int, 2*countValue + 5)
+	//Изначально голова будет больше хвоста - значит наш дек пустой
+	head := len(deque) / 2
+	tail := head - 1
 	for i := 0; i < countValue; i++ {
-		var line string
-		line, _ = reader.ReadString('\n')
-		split := strings.Fields(line)
-		switch split[0] {
-		case "1":
-			num, _ := strconv.Atoi(split[1])
-			deque = addInHead(deque, num)
-		case "2":
-			num, _ := strconv.Atoi(split[1])
-			deque = addInEnd(deque, num)
-		case "3":
-			deque = deleteHead(deque)
-		case "4":
-			deque = deleteEnd(deque)
+		var line int
+		fmt.Fscan(in, &line)
+		switch line {
+		//Весь функционал - смещаем эти два индекса либо вперед или назад
+		case 1:
+			var num int
+        	fmt.Fscan(in, &num)
+			head--
+			deque[head] = num
+		case 2:
+			var num int
+        	fmt.Fscan(in, &num)
+			tail++
+			deque[tail] = num
+		//При удалении смотрим, удаляем то или иное только при не пустом слайсе
+		case 3:
+			if head <= tail {
+				head++
+			}
+		case 4:
+			if tail >= head {
+				tail--
+			}
 		}
-		printHeadAndEnd(deque)
+		if head > tail {
+			out.WriteString("-1\n")
+		} else {
+			out.WriteString(strconv.Itoa(deque[head]))
+			out.WriteByte(' ')
+			out.WriteString(strconv.Itoa(deque[tail]))
+			out.WriteByte('\n')
+		}
 	}
 }

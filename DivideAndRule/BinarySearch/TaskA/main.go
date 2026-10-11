@@ -27,10 +27,10 @@ func main() {
 	for maxIndex >= minIndex {
 		midIndex := (minIndex + maxIndex) / 2
 		if nums[midIndex] == search {
-			resultIndex = midIndex
+			resultIndex = minIndex
 			break
 		}
-		if nums[midIndex] < search {
+		if nums[midIndex] > search {
 			minIndex = midIndex + 1
 			continue
 		}
